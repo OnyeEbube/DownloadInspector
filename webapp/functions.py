@@ -3,13 +3,15 @@ import time
 import mysql.connector
 
 def check_malicious(download_link):
+    # Establish a connection to the MySQL database
     db_connection = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="fumCHI@02%w#",
-        database="download_inspector"
+        host= YOUR-HOST,
+        user= YOUR-USER,
+        password= YOUR-PASSWORD,
+        database= YOUR-DATABASE
     )
 
+    # Create a cursor object to execute SQL queries
     cursor = db_connection.cursor()
 
     # Create scan_results table if it does not exist
@@ -30,13 +32,13 @@ def check_malicious(download_link):
     result = cursor.fetchone()
 
     if result:
-        # If link exists in the database
+        # If link exists in the database, return the stored response
         stored_response = result[0]
         cursor.close()
         db_connection.close()
         return stored_response
     else:
-        # If link does not exist in the database
+        # If link does not exist in the database, perform scanning
         response = perform_scanning(download_link)
         # Store the response in the database
         insert_result_query = "INSERT INTO scan_results (link, result) VALUES (%s, %s)"
@@ -54,19 +56,18 @@ def perform_scanning(download_link):
         'url': download_link
         }
     headers = {
-        "x-apikey": "cggo-adW_tAzg1KrML9eXpqXy4VVca8hmuxEBAgj",
+        "x-apikey": API-KEY,
         "content-type": "application/x-www-form-urlencoded"
     }
 
     response = requests.post(scan_url, data=payload, headers=headers)
-
 
     if response.status_code == 200:
         data = response.json()
         flow_id = data['flow_id']
         id = f"https://filescan.io/api/scan/{flow_id}/report?filter=general&filter=finalVerdict&sorting=string&other=emulationGraph"
         headers = {
-        "x-apikey": "cggo-adW_tAzg1KrML9eXpqXy4VVca8hmuxEBAgj",
+        "x-apikey": API-KEY,
         "Content-Type": "application/json"
         }
 
